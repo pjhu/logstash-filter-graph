@@ -5,7 +5,7 @@ require 'json'
 
 describe LogStash::Filters::Neo4j do
   describe "Set to Hello World" do
-    let(:filter) { LogStash::Plugin.lookup("filter", "neo4j").new({"host" => "192.168.45.56:7474", "user" => "neo4j", "password" => 123456, "query" => "Person"}) }
+    let(:filter) { LogStash::Plugin.lookup("filter", "neo4j").new({"host" => "192.168.45.56:7474", "user" => "neo4j", "password" => 123456, "index" => "idx_vm", "key" => "id", "value" => "vm-21"}) }
     let(:event) do
       LogStash::Event.new({
         "message" => "some message",
@@ -21,7 +21,7 @@ describe LogStash::Filters::Neo4j do
     end
 
     it "should have a location field" do
-      puts event["neo4j"]
+      puts "***", event["neo4j"], "***"
     end
   end
 end
