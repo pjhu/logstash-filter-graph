@@ -52,7 +52,7 @@ class LogStash::Filters::Neo4j < LogStash::Filters::Base
     begin
       if @index && @key && @value
         node = @neo.get_node_index(@index, @key, @value)
-        event["node_data"] = node[0]["data"]
+        event["monitored_entity_id"] = node[0]["data"]["id"]
         in_relations = @neo.get_node_relationships(node[0]["metadata"]["id"], "in") if node.size > 0
         out_relations = @neo.get_node_relationships(node[0]["metadata"]["id"], "out") if node.size > 0
         in_relations.each do |relation|

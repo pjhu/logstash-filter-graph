@@ -21,7 +21,7 @@ describe LogStash::Filters::Neo4j do
     end
 
     it "should have a location field" do
-      puts "***", event["node_data"], event["depency_of"], event["depend_on"], "***"
+      puts "***", event["monitored_entity_id"], event["depency_of"], event["depend_on"], "***"
 
     end
   end
