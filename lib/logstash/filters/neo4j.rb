@@ -51,8 +51,16 @@ class LogStash::Filters::Neo4j < LogStash::Filters::Base
   def filter(event)
     begin
       if @index && @key && @value
-        idx = @neo.get_node_index(@index, @key, @value)
-        event["neo4j"] = @neo.get_node_relationships(idx[0]["metadata"]["id"]) if idx.size > 0
+        node = @neo.get_node_index(@index, @key, @value)
+        event["node_data"] = node[0]["data"]
+        in_relations = @neo.get_node_relationships(node[0]["metadata"]["id"], "in") if node.size > 0
+        out_relations = @neo.get_node_relationships(node[0]["metadata"]["id"], "out") if node.size > 0
+        in_relations.each do |relation|
+          event["depency_of"] = relation["type"].to_s + relation["data"].values.to_s
+        end
+        out_relations.each do |relation|
+          event["depend_on"] = relation["type"].to_s + relation["data"].values.to_s
+        end
       end
     rescue Neography::NotFoundException => e
       @logger.warn("Failed to find node: #{@index},#{@key},#{@value}")
