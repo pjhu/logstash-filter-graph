@@ -55,11 +55,13 @@ class LogStash::Filters::Neo4j < LogStash::Filters::Base
         event["node_data"] = node[0]["data"]
         in_relations = @neo.get_node_relationships(node[0]["metadata"]["id"], "in") if node.size > 0
         out_relations = @neo.get_node_relationships(node[0]["metadata"]["id"], "out") if node.size > 0
+        event["depency_of"] = ""
+        event["depend_on"] = ""
         in_relations.each do |relation|
-          event["depency_of"] = relation["type"].to_s + relation["data"].values.to_s
+          event["depency_of"] << "#{relation["type"]} #{relation["data"].values} "
         end
         out_relations.each do |relation|
-          event["depend_on"] = relation["type"].to_s + relation["data"].values.to_s
+          event["depend_on"] << "#{relation["type"]} #{relation["data"].values} "
         end
       end
     rescue Neography::NotFoundException => e
