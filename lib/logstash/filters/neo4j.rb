@@ -15,13 +15,13 @@ class LogStash::Filters::Neo4j < LogStash::Filters::Base
   config :host, :validate => :string
 
   # Neo4j node index string
-  config :index, :validate => :string
+  config :index, :validate => :string, :default => 'idx_obj_id'
 
   # Neo4j node key string
-  config :key, :validate => :string
+  config :key, :validate => :string, :default => 'obj_id'
 
   # Neo4j node value string
-  config :value, :validate => :string
+  config :computerid, :validate => :string
 
   # Basic Auth - username
   config :user, :validate => :string
@@ -34,8 +34,12 @@ class LogStash::Filters::Neo4j < LogStash::Filters::Base
     # Add instance variables
     require "neography"
     begin
-      if @user && @password && @host
-        @neo_url = "http://#{@user}:#{@password.value}@#{@host}"
+      config = JSON.parse(File.read(File.join(File.dirname(__FILE__), "user.json")))
+      @host = config["host"]
+      @user = config["username"]
+      @password = config["password"]
+      if @host && @user && @password
+        @neo_url = "http://#{@user}:#{@password}@#{@host}"
         @neo = Neography::Rest.new(@neo_url)
       else
         @logger.warn("You must specify user, password, and host")
@@ -50,22 +54,19 @@ class LogStash::Filters::Neo4j < LogStash::Filters::Base
   public
   def filter(event)
     begin
-      if @index && @key && @value
-        node = @neo.get_node_index(@index, @key, @value)
-        event["monitored_entity_id"] = node[0]["data"]["id"]
-        in_relations = @neo.get_node_relationships(node[0]["metadata"]["id"], "in") if node.size > 0
-        out_relations = @neo.get_node_relationships(node[0]["metadata"]["id"], "out") if node.size > 0
-        event["depency_of"] = ""
-        event["depend_on"] = ""
-        in_relations.each do |relation|
-          event["depency_of"] << "#{relation["type"]} #{relation["data"].values} "
-        end
-        out_relations.each do |relation|
-          event["depend_on"] << "#{relation["type"]} #{relation["data"].values} "
+      if @index && @key && @computerid
+        nodes = @neo.get_node_index(@index, @key, @computerid)
+        if nodes && nodes.size > 0
+          node = nodes[0]
+          event["obj_id"] = node["data"]["obj_id"]
+          relations = @neo.get_node_relationships(node)
+          event["dependency_of"] = relations.select {|rel| rel["data"]["end"] == node["data"]["obj_id"]}.map {|rel| rel["data"]["start"]}
+          event["depends_on"] = relations.select {|rel| rel["data"]["start"] == node["data"]["obj_id"]}.map {|rel| rel["data"]["end"]}
+          event["about"] = [event["obj_id"], event["dependency_of"]]
         end
       end
     rescue Neography::NotFoundException => e
-      @logger.warn("Failed to find node: #{@index},#{@key},#{@value}")
+      @logger.warn("Failed to find node: #{@index},#{@key},#{@computerid}")
     rescue Exception => e
       raise e
     end
