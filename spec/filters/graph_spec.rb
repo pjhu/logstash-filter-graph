@@ -1,14 +1,15 @@
 # encoding: utf-8
 require 'spec_helper'
-require "logstash/filters/neo4j"
+require "logstash/filters/graph"
 require 'json'
 
-describe LogStash::Filters::Neo4j do
+describe LogStash::Filters::Graph do
   describe "Set to Hello World" do
-    let(:filter) { LogStash::Plugin.lookup("filter", "neo4j").new({"computerid" => "10.202.4.210"}) }
+    let(:filter) { LogStash::Plugin.lookup("filter", "graph").new({"key" => "computername"}) }
     let(:event) do
       LogStash::Event.new({
         "message" => "some message",
+        "computername" => "10.202.4.210",
         "seq" => rand(1000),
         "@version" => "1",
         "@timestamp" => Time.now.utc.iso8601(3)
