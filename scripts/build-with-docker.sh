@@ -7,5 +7,6 @@ docker run \
   -t --rm \
   -v "$project_home":/project \
   -w /project \
+  -e "BUILD_NUM=$BUILD_NUM" \
   jruby:9.0.3 \
   scripts/build.sh \
