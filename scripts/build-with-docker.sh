@@ -3,5 +3,9 @@
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . "$script_dir"/common.sh #use quote here to compliant with space in dir
 
-bundle
-rake build:build_gem build:dump_version build:dockerfile
+docker run \
+  -t --rm \
+  -v "$project_home":/project \
+  -w /project \
+  jruby:9.0.3 \
+  scripts/build.sh \
