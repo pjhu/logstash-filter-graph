@@ -5,7 +5,7 @@ require 'json'
 
 describe LogStash::Filters::Graph do
   describe "Set to Hello World" do
-    let(:filter) { LogStash::Plugin.lookup("filter", "graph").new({"key" => "computername"}) }
+    let(:filter) { LogStash::Plugin.lookup("filter", "graph").new({"configfile" => File.join(File.dirname(__FILE__), "user.json"), "key" => "computername"}) }
     let(:event) do
       LogStash::Event.new({
         "message" => "some message",

@@ -29,12 +29,15 @@ class LogStash::Filters::Graph < LogStash::Filters::Base
   # Basic Auth - password
   config :password, :validate => :password
 
+  # Basic Auth File
+  config :configfile, :validate => :string
+
   public
   def register
     # Add instance variables
     require "neography"
     begin
-      config = JSON.parse(File.read(File.join(File.dirname(__FILE__), "user.json")))
+      config = JSON.parse(File.read(@configfile))
       @host = config["host"]
       @user = config["username"]
       @password = config["password"]
