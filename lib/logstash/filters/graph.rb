@@ -57,8 +57,14 @@ class LogStash::Filters::Graph < LogStash::Filters::Base
   public
   def filter(event)
     begin
-      if @index && @value && event[@key]
-        nodes = @neo.get_node_index(@index, @value, event[@key])
+      if @key.blank?
+        keys = ""
+      else
+        keys = event
+        @key.split('.').each{|k| keys=keys[k]}
+      end
+      if @index && @value && !keys.blank?
+        nodes = @neo.get_node_index(@index, @value, keys)
         if nodes && nodes.size > 0
           node = nodes[0]
           event["obj_id"] = node["data"]["obj_id"]
