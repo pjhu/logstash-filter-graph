@@ -1,0 +1,6 @@
+FROM logstash:<%= @logstash_version %>
+
+COPY ./*.gem /
+RUN cd /opt/logstash \
+	&& bin/logstash-plugin install /*.gem \
+	&& rm /*.gem

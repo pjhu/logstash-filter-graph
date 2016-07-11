@@ -1,8 +1,8 @@
 Gem::Specification.new do |s|
-  s.name = 'logstash-filter-neo4j'
+  s.name = 'logstash-filter-graph'
   s.version         = '0.1.0'
   s.licenses = ['Apache License (2.0)']
-  s.summary = "This neo4j filter replaces the contents of the message field with the specified value."
+  s.summary = "This graph filter replaces the contents of the message field with the specified value."
   s.description     = "This gem is a Logstash plugin required to be installed on top of the Logstash core pipeline using $LS_HOME/bin/logstash-plugin install gemname. This gem is not a stand-alone program"
   s.authors = ["Elastic"]
   s.email = 'info@elastic.co'
